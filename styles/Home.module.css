@@ -1,0 +1,95 @@
+.page {
+  --gray-rgb: 0, 0, 0;
+  --gray-alpha-200: rgba(var(--gray-rgb), 0.08);
+  --gray-alpha-100: rgba(var(--gray-rgb), 0.05);
+
+  --button-primary-hover: #383838;
+  --button-secondary-hover: #f2f2f2;
+
+  /* display: grid; */ /* Removed grid layout */
+  /* grid-template-rows: 20px 1fr 20px; */
+  /* align-items: center; */ /* Can be handled by flex if needed */
+  /* justify-items: center; */ /* Can be handled by flex if needed */
+  min-height: 100svh;
+  padding: 2rem; /* Adjusted padding */
+  /* gap: 64px; */ /* Gap might not be needed or can be handled by margins */
+  font-family: var(--font-geist-sans);
+  display: flex; /* Use flex to center content if needed */
+  flex-direction: column;
+  align-items: center; /* Center children like 'main' */
+}
+
+@media (prefers-color-scheme: dark) {
+  .page {
+    --gray-rgb: 255, 255, 255;
+    --gray-alpha-200: rgba(var(--gray-rgb), 0.145);
+    --gray-alpha-100: rgba(var(--gray-rgb), 0.06);
+
+    --button-primary-hover: #ccc;
+    --button-secondary-hover: #1a1a1a;
+  }
+}
+
+/* Styles for the main page layout */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  width: 100%;
+  max-width: 900px; /* Max width for the content area */
+  margin: 0 auto; /* Center the container */
+}
+
+.title {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: var(--foreground);
+}
+
+.description {
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  line-height: 1.6;
+  color: var(--foreground);
+  max-width: 700px; /* Max width for description text */
+}
+
+/* Adjust .main to allow container to center */
+.main {
+  display: flex;
+  flex-direction: column;
+  width: 100%; /* Ensure main takes full width */
+  max-width: 1200px; /* Optional: constrain overall main width */
+  align-items: center; /* Center the .container within .main */
+  padding-top: 2rem;
+}
+
+/* Removed old styles for ol, li, code, ctas, footer as they are no longer used by pages/index.js */
+/* Media queries related to these elements were also removed. */
+
+/* Basic responsive adjustments for the page padding */
+@media (max-width: 600px) {
+  .page {
+    padding: 1rem; /* Reduce padding on smaller screens */
+  }
+  .container {
+    padding: 1rem; /* Reduce padding on smaller screens */
+  }
+  .title {
+    font-size: 2rem; /* Adjust title font size for smaller screens */
+  }
+  .description {
+    font-size: 1rem; /* Adjust description font size */
+  }
+}
+
+/* Dark mode adjustments for logo if any logo is used (currently not in index.js) */
+/* @media (prefers-color-scheme: dark) {
+  .logo {
+    filter: invert();
+  }
+} */

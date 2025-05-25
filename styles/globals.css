@@ -1,0 +1,181 @@
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+/* Tiptap editor styles */
+.ProseMirror {
+  border: 1px solid #ccc;
+  padding: 10px;
+  min-height: 200px;
+  border-radius: 5px;
+}
+
+.ProseMirror:focus {
+  outline: none;
+  border-color: #0070f3;
+}
+
+/* Highlighting styles */
+.highlight-red {
+  background-color: rgba(255, 0, 0, 0.2);
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-decoration-color: red;
+}
+
+.highlight-yellow {
+  background-color: rgba(255, 255, 0, 0.3);
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-decoration-color: orange;
+}
+
+.highlight-default {
+  background-color: rgba(128, 128, 128, 0.2); /* Grey for unspecified issues */
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-decoration-color: gray;
+}
+
+.highlight-blue {
+  background-color: rgba(0, 0, 255, 0.15); /* Light blue for phrasing suggestions */
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: blue;
+  cursor: pointer; /* Add cursor to indicate clickability */
+}
+
+/* Enhance existing highlight styles for better visibility and clickability */
+.highlight-red, .highlight-yellow, .highlight-default {
+  cursor: pointer; /* Add cursor to all highlights */
+  padding: 0.1em 0; /* Add slight padding for better visual separation if background is very subtle */
+}
+.highlight-red {
+  background-color: rgba(255, 0, 0, 0.25); /* Slightly more intense red */
+}
+.highlight-yellow {
+  background-color: rgba(255, 220, 0, 0.35); /* Adjust yellow for better visibility */
+}
+
+
+/* Suggestion Popup Styles */
+.suggestion-popup {
+  position: absolute;
+  border: 1px solid #ddd; /* Softer border */
+  background: white;
+  padding: 12px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 1000;
+  min-width: 220px; /* Slightly wider */
+  font-family: Arial, Helvetica, sans-serif; /* Consistent font */
+}
+
+.suggestion-popup-title {
+  margin: 0 0 10px 0;
+  font-size: 0.95em; /* Slightly larger */
+  color: #333;
+}
+
+.suggestion-popup-title strong {
+  color: #111; /* Darker for better contrast */
+}
+
+.suggestion-popup-list {
+  list-style: none;
+  margin: 0 0 12px 0;
+  padding: 0;
+  max-height: 150px; /* Allow scrolling for many suggestions */
+  overflow-y: auto;
+}
+
+.suggestion-popup-item {
+  margin-bottom: 6px;
+}
+
+.suggestion-popup-item button {
+  width: 100%;
+  padding: 8px 10px; /* More padding */
+  border: 1px solid #0070f3;
+  background: #0070f3;
+  color: white;
+  border-radius: 4px; /* Consistent border-radius */
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.9em;
+  transition: background-color 0.2s ease; /* Smooth transition */
+}
+
+.suggestion-popup-item button:hover {
+  background: #005bb5; /* Darker blue on hover */
+  border-color: #005bb5;
+}
+
+.suggestion-popup-no-suggestions {
+  margin: 0 0 10px 0;
+  font-size: 0.85em;
+  color: #777; /* Softer color for less emphasis */
+}
+
+.suggestion-popup-actions {
+  display: flex;
+  justify-content: flex-end; /* Align buttons to the right */
+}
+
+.suggestion-popup-button {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  background: #f0f0f0;
+  color: #333;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.suggestion-popup-button:hover {
+  background: #e0e0e0;
+  border-color: #bbb;
+}
+
+/* Specific button styling if needed, for now, general is fine for "Ignore" */
+/* .suggestion-popup-button.ignore {} */

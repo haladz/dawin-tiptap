@@ -1,0 +1,21 @@
+{
+  "name": "temp_next_app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@tiptap/core": "^2.12.0",
+    "@tiptap/react": "^2.12.0",
+    "@tiptap/starter-kit": "^2.12.0",
+    "lodash": "^4.17.21",
+    "next": "15.3.2",
+    "openai": "^4.103.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}
