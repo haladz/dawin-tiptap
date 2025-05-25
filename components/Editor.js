@@ -3,38 +3,38 @@ import StarterKit from '@tiptap/starter-kit';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import _debounce from 'lodash/debounce';
 import HighlightExtension from '@/extensions/HighlightExtension';
-import SuggestionPopup from './SuggestionPopup'; // Import the popup component
+import SuggestionPopup from './SuggestionPopup';
 
 const Editor = () => {
   const [issues, setIssues] = useState([]);
   const [activeIssue, setActiveIssue] = useState(null);
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
-  const editorRef = useRef(null); // To get editor container position
+  const editorRef = useRef(null);
 
-  const handleHighlightClick = ({ event, issue }) => {
+  // Memoize handleHighlightClick as it's a dependency for useEditor
+  const handleHighlightClick = useCallback(({ event, issue }) => {
     setActiveIssue(issue);
-    // Position popup relative to the editor container to handle scrolling
     const editorRect = editorRef.current ? editorRef.current.getBoundingClientRect() : { top: 0, left: 0 };
     setPopupPosition({
-      top: event.clientY - editorRect.top + window.scrollY + 10, // Add scrollY for absolute positioning
-      left: event.clientX - editorRect.left + window.scrollX,      // Add scrollX
+      top: event.clientY - editorRect.top + window.scrollY + 10,
+      left: event.clientX - editorRect.left + window.scrollX,
     });
-  };
+  }, []); // No dependencies, this function is stable
 
   const editor = useEditor({
     extensions: [
       StarterKit,
-      HighlightExtension.configure({
-        issues,
-        onHighlightClick: handleHighlightClick,
+      HighlightExtension.configure({ // Options are passed here
+        issues, // The 'issues' state
+        onHighlightClick: handleHighlightClick, // The memoized callback
       }),
     ],
     content: '<p>This is a testt with some mistaks. Styel can be improved too.</p>',
     onUpdate: ({ editor }) => {
       debouncedCheckText(editor.getText());
-      setActiveIssue(null); // Hide popup on text change
+      setActiveIssue(null);
     },
-  });
+  }, [issues, handleHighlightClick]); // Add issues and handleHighlightClick to useEditor's dependency array
 
   const checkTextWithAPI = async (text) => {
     if (!text.trim()) {
@@ -64,11 +64,17 @@ const Editor = () => {
 
   const debouncedCheckText = useCallback(_debounce(checkTextWithAPI, 1000), []);
 
+  // This useEffect might no longer be needed if useEditor handles option updates via its dependency array.
+  // If issues persist, this could be a point of failure.
+  // For now, let's comment it out to test if the direct reconfiguration via useEditor works.
+  /*
   useEffect(() => {
     if (editor && editor.extensionManager.extensions.find(ext => ext.name === 'highlightExtension')) {
+      // This check should ideally prevent "Can't find extension" errors
       editor.chain().focus().updateExtensionOptions('highlightExtension', { issues, onHighlightClick: handleHighlightClick }).run();
     }
-  }, [issues, editor]); // handleHighlightClick can be added if it changes, but it's stable if defined outside useEffect
+  }, [issues, editor, handleHighlightClick]); // Added handleHighlightClick to dependencies here too
+  */
 
   useEffect(() => {
     if (editor) {
@@ -77,7 +83,7 @@ const Editor = () => {
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [editor, debouncedCheckText]);
+  }, [editor, debouncedCheckText]); // debouncedCheckText is stable
 
   const handleAcceptSuggestion = (issueToCorrect, suggestion) => {
     if (!editor) return;

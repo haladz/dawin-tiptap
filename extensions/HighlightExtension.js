@@ -15,12 +15,29 @@ const HighlightExtension = Extension.create({
   addProseMirrorPlugins() {
     const self = this; // Access the extension instance
 
+    // Safeguard: Ensure self and self.options are available, providing defaults if not.
+    const getOptions = () => {
+      if (!self || !self.options) {
+        // This case should ideally not happen if TipTap's lifecycle is correct.
+        // Providing super-defensive defaults.
+        return {
+          issues: [],
+          onHighlightClick: () => {},
+        };
+      }
+      return {
+        issues: self.options.issues || [],
+        onHighlightClick: self.options.onHighlightClick || (() => {}),
+      };
+    };
+
     return [
       new Plugin({
         key: new PluginKey('highlight'),
         state: {
           init: (_, { doc }) => {
-            const decorations = self.options.issues.map((issue, index) => {
+            const currentOptions = getOptions();
+            const decorations = currentOptions.issues.map((issue, index) => {
               let className = 'highlight-default';
               if (issue.type === 'spelling' || issue.type === 'grammar') {
                 className = 'highlight-red';
@@ -48,10 +65,12 @@ const HighlightExtension = Extension.create({
             return DecorationSet.create(doc, decorations);
           },
           apply: (tr, oldSet, oldState, newState) => {
-            if (tr.docChanged || oldState.doc.content.size !== newState.doc.content.size || self.options.issues !== oldSet.spec.options.issues) {
+            const currentOptions = getOptions();
+            const previousIssues = oldSet.spec && oldSet.spec.options ? oldSet.spec.options.issues || [] : [];
+
+            if (tr.docChanged || oldState.doc.content.size !== newState.doc.content.size || currentOptions.issues !== previousIssues) {
               const { doc } = newState;
-              const newIssues = self.options.issues;
-              const decorations = newIssues.map((issue, index) => {
+              const decorations = currentOptions.issues.map((issue, index) => {
                 let className = 'highlight-default';
                 if (issue.type === 'spelling' || issue.type === 'grammar') {
                   className = 'highlight-red';
@@ -86,11 +105,12 @@ const HighlightExtension = Extension.create({
             click: (view, event) => {
               const target = event.target;
               if (target && target.hasAttribute('data-issue-index')) {
+                const currentOptionsOnClick = getOptions(); // Get potentially updated options
                 const issueIndex = parseInt(target.getAttribute('data-issue-index'), 10);
-                const issue = self.options.issues[issueIndex];
-                if (issue && self.options.onHighlightClick) {
-                  // Pass event for positioning, and the full issue object
-                  self.options.onHighlightClick({ event, issue });
+                const issue = currentOptionsOnClick.issues[issueIndex];
+
+                if (issue && typeof currentOptionsOnClick.onHighlightClick === 'function') {
+                  currentOptionsOnClick.onHighlightClick({ event, issue });
                   return true; // Indicate that the event was handled
                 }
               }
@@ -98,8 +118,11 @@ const HighlightExtension = Extension.create({
             },
           },
         },
+        // The spec should reflect the structure expected by getOptions,
+        // or simply pass self.options and let getOptions handle it.
+        // For robustness, ensure spec.options exists for comparison in apply.
         spec: {
-          options: self.options,
+          options: self.options || { issues: [], onHighlightClick: () => {} },
         }
       }),
     ];
