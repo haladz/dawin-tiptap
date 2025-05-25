@@ -24,9 +24,9 @@ const Editor = () => {
   const editor = useEditor({
     extensions: [
       StarterKit,
-      HighlightExtension.configure({ // Options are passed here
-        issues, // The 'issues' state
-        onHighlightClick: handleHighlightClick, // The memoized callback
+      HighlightExtension.configure({ // Initial options
+        issues,
+        onHighlightClick: handleHighlightClick,
       }),
     ],
     content: '<p>This is a testt with some mistaks. Styel can be improved too.</p>',
@@ -34,7 +34,7 @@ const Editor = () => {
       debouncedCheckText(editor.getText());
       setActiveIssue(null);
     },
-  }, [issues, handleHighlightClick]); // Add issues and handleHighlightClick to useEditor's dependency array
+  }, []); // Initialize once; options updated via useEffect
 
   const checkTextWithAPI = async (text) => {
     if (!text.trim()) {
@@ -47,15 +47,27 @@ const Editor = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text }),
       });
+
+      const contentType = response.headers.get('content-type') || '';
+      let responseData;
+      if (contentType.includes('application/json')) {
+        // Safely parse JSON only if the response is JSON
+        responseData = await response.json();
+      } else {
+        // Fallback to text to avoid JSON parsing errors like
+        // "SyntaxError: Unexpected token '<'"
+        const textData = await response.text();
+        responseData = { error: textData };
+      }
+
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error('API Error:', errorData.error);
+        console.error('API Error:', responseData.error || response.statusText);
         setIssues([]);
         return;
       }
-      const data = await response.json();
-      console.log('API Response:', data);
-      setIssues(data.issues || []);
+
+      console.log('API Response:', responseData);
+      setIssues(responseData.issues || []);
     } catch (error) {
       console.error('Failed to fetch issues:', error);
       setIssues([]);
@@ -64,17 +76,12 @@ const Editor = () => {
 
   const debouncedCheckText = useCallback(_debounce(checkTextWithAPI, 1000), []);
 
-  // This useEffect might no longer be needed if useEditor handles option updates via its dependency array.
-  // If issues persist, this could be a point of failure.
-  // For now, let's comment it out to test if the direct reconfiguration via useEditor works.
-  /*
+  // Update HighlightExtension options when issues change without re-initializing the editor
   useEffect(() => {
     if (editor && editor.extensionManager.extensions.find(ext => ext.name === 'highlightExtension')) {
-      // This check should ideally prevent "Can't find extension" errors
       editor.chain().focus().updateExtensionOptions('highlightExtension', { issues, onHighlightClick: handleHighlightClick }).run();
     }
-  }, [issues, editor, handleHighlightClick]); // Added handleHighlightClick to dependencies here too
-  */
+  }, [issues, editor, handleHighlightClick]);
 
   useEffect(() => {
     if (editor) {
@@ -117,7 +124,8 @@ const Editor = () => {
 
   return (
     <div ref={editorRef} style={{ position: 'relative' }}> {/* Wrapper for positioning context */}
-      <EditorContent editor={editor} />
+      {/* dir="auto" allows automatic right-to-left support when typing Arabic */}
+      <EditorContent editor={editor} dir="auto" />
       {activeIssue && (
         <SuggestionPopup
           issue={activeIssue}

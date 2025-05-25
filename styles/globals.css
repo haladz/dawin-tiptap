@@ -19,7 +19,8 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Include common Arabic fonts for basic RTL support */
+  font-family: Arial, Helvetica, "Noto Sans Arabic", "Noto Kufi Arabic", "Scheherazade New", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -47,6 +48,12 @@ a {
   padding: 10px;
   min-height: 200px;
   border-radius: 5px;
+}
+
+/* Ensure proper right-to-left layout when dir="rtl" */
+.ProseMirror[dir='rtl'] {
+  direction: rtl;
+  text-align: right;
 }
 
 .ProseMirror:focus {
