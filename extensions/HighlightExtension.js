@@ -127,6 +127,26 @@ const HighlightExtension = Extension.create({
       }),
     ];
   },
+
+  addCommands() {
+    return {
+      /**
+       * Update options for this extension after initialization.
+       * @param {string} name - Extension name expected to match this.name
+       * @param {object} options - Options to merge into the current ones
+       */
+      updateExtensionOptions:
+        (name, options) => ({ editor }) => {
+          if (name !== this.name) {
+            return false;
+          }
+          Object.assign(this.options, options);
+          // Trigger a transaction so ProseMirror plugins can react to the changes
+          editor.view.dispatch(editor.state.tr);
+          return true;
+        },
+    };
+  },
 });
 
 export default HighlightExtension;
